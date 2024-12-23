@@ -1,13 +1,15 @@
+import { Input } from "@/components/ui/input";
 import "./App.css";
-import { Button } from "@/components/ui/button";
 
 function App() {
   return (
-    <>
-      <div>
-        <Button>Click me</Button>
+    <div className="w-screen h-screen p-4">
+      <div className="flex flex-col w-full">
+        <div>
+          <Input placeholder="search"></Input>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
