@@ -13,9 +13,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export function RangePicker() {
-  const [date, setDate] = React.useState<DateRange>();
-
+export const RangePicker: React.FC<{
+  date: DateRange;
+  setDate: (v: DateRange) => void;
+}> = ({ date, setDate }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -33,8 +34,8 @@ export function RangePicker() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-4">
-        <DayPicker mode="range" selected={date} onSelect={setDate} />
+        <DayPicker required mode="range" selected={date} onSelect={setDate} />
       </PopoverContent>
     </Popover>
   );
-}
+};
