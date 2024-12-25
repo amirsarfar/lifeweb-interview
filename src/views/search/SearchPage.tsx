@@ -62,7 +62,7 @@ function SearchPage() {
       <div className="flex flex-col gap-2">
         <Input
           placeholder="search"
-          value={params.q}
+          value={params.q ?? ""}
           onChange={(e) => {
             setParams((prev) => ({ ...prev, q: e.target.value }));
           }}
