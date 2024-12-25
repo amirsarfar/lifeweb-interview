@@ -1,8 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { RangePicker } from "@/components/range-picker";
-import { useEffect, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
-import qs from "qs";
 import { format } from "date-fns";
 import {
   Table,
@@ -20,46 +18,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useUrlState } from "@/views/search/useSearchUrlState";
-
-type TPost = {
-  title: string;
-  id: string;
-  lead: string;
-  published_at: string;
-  content: string;
-  news_agency_name: string;
-  url: string;
-};
+import { useSearchData } from "@/views/search/useSearchData";
+import { Checkbox } from "@/components/ui/checkbox";
 
 function SearchPage() {
   const isDesktop = useMediaQuery("(min-width: 1280px)");
 
-  const [blogPosts, setBlogPosts] = useState<TPost[]>([]);
+  const { params, setParams, blogPosts } = useSearchData();
 
-  const { params, deferredParams, setParams } = useUrlState();
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    (async () => {
-      const postsRes = await fetch(
-        `http://localhost:3000/api/blog_posts?${qs.stringify(deferredParams)}`,
-        { signal }
-      );
-      if (postsRes.ok) {
-        const data = await postsRes.json();
-        setBlogPosts(data);
-      }
-    })();
-
-    return () =>
-      controller.abort("Filter has changed before request completion");
-  }, [deferredParams]);
   return (
-    <>
-      <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-5 xl:flex-row">
+      <div className="flex flex-col gap-3">
         <Input
           placeholder="search"
           value={params.q ?? ""}
@@ -80,6 +49,21 @@ function SearchPage() {
             }));
           }}
         ></RangePicker>
+        <div className="flex items-center gap-2 px-1">
+          <Checkbox
+            id="throw_error"
+            checked={!!params.error}
+            onCheckedChange={(v) =>
+              setParams((prev) => ({ ...prev, error: v ? "true" : undefined }))
+            }
+          />
+          <label
+            htmlFor="throw_error"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Throw API Error
+          </label>
+        </div>
       </div>
 
       <div className="max-h-screen flex-grow min-w-1 overflow-auto">
@@ -139,7 +123,7 @@ function SearchPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
