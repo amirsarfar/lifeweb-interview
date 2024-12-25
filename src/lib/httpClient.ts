@@ -85,3 +85,10 @@ const httpClient = {
 };
 
 export default httpClient;
+
+export class CancelError {
+  message: string = "";
+  constructor(message: string) {
+    this.message = message;
+  }
+}

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import qs, { ParsedQs } from "qs";
 import { useDebounceCallback } from "usehooks-ts";
-import httpClient from "@/lib/httpClient";
+import httpClient, { CancelError } from "@/lib/httpClient";
+import { useToast } from "@/hooks/use-toast";
 
 type TPost = {
   title: string;
@@ -54,6 +55,7 @@ const useSearchUrlState = () => {
 };
 
 export const useSearchData = () => {
+  const { toast } = useToast();
   const [blogPosts, setBlogPosts] = useState<TPost[]>([]);
 
   const { params, deferredParams, setParams } = useSearchUrlState();
@@ -62,26 +64,37 @@ export const useSearchData = () => {
     const controller = new AbortController();
     const signal = controller.signal;
 
+    const handleError = () => {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem in our server.",
+      });
+      setBlogPosts([]);
+    };
+
     (async () => {
       try {
         const postsRes = await httpClient.get({
           endpoint: `api/blog_posts?${qs.stringify(deferredParams)}`,
           signal,
         });
-
         if (postsRes.ok) {
           const data = await postsRes.json();
           setBlogPosts(data);
-          return;
+        } else {
+          handleError();
         }
-      } catch {
-        //
+      } catch (e) {
+        if (!(e instanceof CancelError)) handleError();
       }
     })();
 
     return () =>
-      controller.abort("Filter has changed before request completion");
-  }, [deferredParams]);
+      controller.abort(
+        new CancelError("Filter has changed before request completion")
+      );
+  }, [deferredParams, toast]);
 
   return { params, setParams, blogPosts };
 };
