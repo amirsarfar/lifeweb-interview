@@ -27,7 +27,7 @@ function SearchPage() {
   const { params, setParams, blogPosts } = useSearchData();
 
   return (
-    <div className="flex flex-col gap-5 xl:flex-row">
+    <div className="flex flex-col h-full gap-5 xl:flex-row">
       <div className="flex flex-col gap-3">
         <Input
           placeholder="search"
@@ -66,7 +66,7 @@ function SearchPage() {
         </div>
       </div>
 
-      <div className="max-h-screen flex-grow min-w-1 overflow-auto">
+      <div className="flex-grow min-h-1 min-w-1 overflow-auto">
         {isDesktop ? (
           <Table>
             <TableHeader>
